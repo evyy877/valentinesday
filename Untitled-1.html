@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Dia dos Namorados! </title>
+    <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Garante que o corpo ocupe a altura total da viewport */
+            background-color: #1E90FF; /* Fundo azul claro */
+            font-family: 'Arial', sans-serif;
+            color: black;
+            text-align: center;
+            overflow: hidden; /* Evita barras de rolagem desnecessárias */
+            flex-direction: column; /* Organiza os itens em coluna */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            max-width: 90vw; /* Limita a largura do container */
+        }
+
+        /* Estilos e animações do Coração SVG */
+        .heart-svg {
+            width: 250px; /* Largura do coração */
+            height: 250px; /* Altura do coração */
+            margin-bottom: 20px;
+            position: relative; /* Para posicionar a imagem dentro dele */
+            overflow: visible; /* Permite que a imagem possa sair ligeiramente dos limites se dimensionada */
+        }
+
+        .heart-svg #heartPath {
+            fill: transparent; /* Começa sem preenchimento */
+            stroke: red; /* Contorno vermelho */
+            stroke-width: 4px; /* Espessura do contorno */
+            transition: fill 1s ease-in-out; /* Transição suave para o preenchimento */
+        }
+
+        /* Animação de desenho do contorno */
+        @keyframes drawHeart {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Animação de preenchimento do coração */
+        @keyframes fillHeart {
+            to {
+                fill: red;
+            }
+        }
+
+        /* Classes JS para controlar as animações */
+        .heart-svg #heartPath.drawing {
+            animation: drawHeart 2s ease-out forwards; /* Animação de 2s para desenhar */
+        }
+
+        .heart-svg #heartPath.filling {
+            animation: fillHeart 1s ease-in forwards; /* Animação de 1s para preencher */
+            animation-delay: 2.2s; /* Começa a preencher depois que o desenho termina + um pequeno atraso */
+        }
+
+        /* Estilo para a imagem dentro do SVG */
+        .heart-svg #photo-in-heart {
+            /* Ajuste x e y para centralizar a imagem dentro do coração */
+            /* width e height em relação ao viewBox (100x100) */
+            /* Se o viewBox for 100x100, e a imagem tem 60x60, centralize com x=20, y=20 */
+            x: 20; /* Posição horizontal da imagem dentro do SVG */
+            y: 20; /* Posição vertical da imagem dentro do SVG */
+            width: 60; /* Largura da imagem dentro do SVG (em relação ao viewBox 100) */
+            height: 60; /* Altura da imagem dentro do SVG (em relação ao viewBox 100) */
+            border-radius: 50%; /* Faz a imagem parecer redonda se quiser */
+            object-fit: cover; /* Garante que a imagem preencha a área sem distorcer */
+            clip-path: circle(30% at 50% 45%); /* Exemplo: Tenta cortar a imagem em forma de círculo */
+            /* Para cortar em forma de coração, seria necessário uma máscara SVG mais complexa */
+        }
+
+
+        /* Mensagens de Texto */
+        .message {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: black; /* Cor da mensagem */
+            max-width: 80%; /* Limita a largura da mensagem */
+        }
+
+        .countdown-text {
+            font-size: 1.1em;
+            font-weight: normal;
+            color: black; /* Cor da contagem */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="heart-svg" viewBox="0 0 100 100">
+            <image id="photo-in-heart" href="https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_icon.png" />
+            <path id="heartPath" d="M 50 30 C 50 15, 60 0, 80 0 C 95 0, 100 15, 100 30 C 100 45, 80 60, 50 85 C 20 60, 0 45, 0 30 C 0 15, 5 0, 20 0 C 40 0, 50 15, 50 30 Z"></path>
+        </svg>
+
+        <p class="message">Para você que roubou meu coração. Feliz dia dos namorados, meu amor!</p>
+
+        <p class="countdown-text">Juntos a: <span id="countdown"></span></p>
+    </div>
+
+    <script>
+        // Lógica JavaScript para Animação do Coração
+        const heartPath = document.getElementById('heartPath');
+        const photoInHeart = document.getElementById('photo-in-heart');
+
+        const pathLength = heartPath.getTotalLength(); // Obtém o comprimento total do caminho SVG
+
+        // Configura o stroke-dasharray e stroke-dashoffset para esconder o contorno inicialmente
+        heartPath.style.strokeDasharray = pathLength;
+        heartPath.style.strokeDashoffset = pathLength;
+
+        // Esconde a foto inicialmente
+        photoInHeart.style.opacity = '0';
+        photoInHeart.style.transition = 'opacity 0.5s ease-in-out'; // Transição suave para a foto
+
+        // Adiciona a classe 'drawing' para iniciar a animação de desenho
+        setTimeout(() => {
+            heartPath.classList.add('drawing');
+        }, 100);
+
+        // Quando a animação de desenho termina, adiciona a classe 'filling' e mostra a foto
+        heartPath.addEventListener('animationend', (event) => {
+            if (event.animationName === 'drawHeart') {
+                heartPath.classList.add('filling');
+                // Mostra a foto um pouco depois do coração começar a preencher ou depois de preencher
+                setTimeout(() => {
+                    photoInHeart.style.opacity = '1';
+                }, 2500); // Ex: 2500ms = 2.2s (fillHeart delay) + 0.3s (pequeno atraso adicional)
+            }
+        });
+
+
+        // Lógica JavaScript para a Contagem Progressiva
+        function updateCountdown() {
+            // Data de início da contagem (Ano, Mês-1, Dia, Hora, Minuto, Segundo)
+            // Mês é base 0 (0 = Janeiro, 6 = Julho)
+            const startDate = new Date(2024, 6, 13, 0, 0, 0); // 13 de Julho de 2024, 00:00:00
+            const now = new Date();
+
+            const differenceMs = now.getTime() - startDate.getTime(); // Diferença em milissegundos
+
+            // Se a data atual for anterior à data de início, exibe uma mensagem
+            if (differenceMs < 0) {
+                document.getElementById('countdown').textContent = "A data atual é anterior à data de início. Ajuste a data.";
+                return;
+            }
+
+            // Calcula dias, horas, minutos e segundos a partir da diferença em milissegundos
+            const totalSeconds = Math.floor(differenceMs / 1000);
+
+            const days = Math.floor(totalSeconds / (24 * 3600));
+            const remainingSecondsAfterDays = totalSeconds % (24 * 3600);
+
+            const hours = Math.floor(remainingSecondsAfterDays / 3600);
+            const remainingSecondsAfterHours = remainingSecondsAfterDays % 3600;
+
+            const minutes = Math.floor(remainingSecondsAfterHours / 60);
+            const seconds = remainingSecondsAfterHours % 60;
+
+            // Formata os números para ter sempre dois dígitos (ex: 05, 09)
+            const formattedHours = String(hours).padStart(2, '0');
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(seconds).padStart(2, '0');
+
+            // Atualiza o texto da contagem no HTML
+            document.getElementById('countdown').textContent =
+                `${days} dias, ${formattedHours} horas, ` +
+                `${formattedMinutes} minutos e ` +
+                `${formattedSeconds} segundos`;
+        }
+
+        // Chama a função de contagem uma vez para exibir imediatamente
+        updateCountdown();
+
+        // Atualiza a contagem a cada segundo
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
